@@ -17,24 +17,24 @@ export function capitalizeWords(str: string): string {
 
 export function getWeatherGradient(weatherMain: string): string {
   const weatherGradients: Record<string, string> = {
-    Clear: 'gradient-bg-sky',
-    Clouds: 'bg-gradient-to-br from-gray-600 to-gray-800',
-    Rain: 'bg-gradient-to-br from-gray-700 to-blue-900',
-    Drizzle: 'bg-gradient-to-br from-gray-600 to-blue-700',
-    Thunderstorm: 'bg-gradient-to-br from-gray-900 to-purple-900',
-    Snow: 'bg-gradient-to-br from-gray-200 to-blue-300',
-    Mist: 'bg-gradient-to-br from-gray-500 to-gray-700',
-    Smoke: 'bg-gradient-to-br from-gray-600 to-gray-800',
-    Haze: 'bg-gradient-to-br from-yellow-400 to-orange-500',
-    Dust: 'bg-gradient-to-br from-yellow-600 to-orange-700',
-    Fog: 'bg-gradient-to-br from-gray-400 to-gray-600',
-    Sand: 'bg-gradient-to-br from-yellow-500 to-orange-600',
-    Ash: 'bg-gradient-to-br from-gray-500 to-gray-700',
-    Squall: 'bg-gradient-to-br from-gray-700 to-blue-900',
-    Tornado: 'bg-gradient-to-br from-gray-900 to-red-900',
+    Clear: 'bg-gradient-to-br from-[#181818] via-blue-900/60 to-sky-900/70',
+    Clouds: 'bg-gradient-to-br from-[#181818] via-gray-800/80 to-gray-900/70',
+    Rain: 'bg-gradient-to-br from-[#181818] via-blue-900/70 to-slate-900/80',
+    Drizzle: 'bg-gradient-to-br from-[#181818] via-blue-800/60 to-gray-900/70',
+    Thunderstorm: 'bg-gradient-to-br from-[#181818] via-purple-900/80 to-gray-900/90',
+    Snow: 'bg-gradient-to-br from-[#181818] via-blue-900/50 to-slate-800/60',
+    Mist: 'bg-gradient-to-br from-[#181818] via-gray-800/70 to-slate-900/60',
+    Smoke: 'bg-gradient-to-br from-[#181818] via-gray-900/80 to-stone-900/70',
+    Haze: 'bg-gradient-to-br from-[#181818] via-orange-900/60 to-yellow-900/50',
+    Dust: 'bg-gradient-to-br from-[#181818] via-orange-900/70 to-amber-900/60',
+    Fog: 'bg-gradient-to-br from-[#181818] via-gray-800/60 to-slate-900/50',
+    Sand: 'bg-gradient-to-br from-[#181818] via-yellow-900/60 to-orange-900/70',
+    Ash: 'bg-gradient-to-br from-[#181818] via-gray-900/70 to-stone-900/80',
+    Squall: 'bg-gradient-to-br from-[#181818] via-blue-900/80 to-slate-900/70',
+    Tornado: 'bg-gradient-to-br from-[#181818] via-red-900/80 to-gray-900/90',
   };
   
-  return weatherGradients[weatherMain] || 'gradient-bg-sky';
+  return weatherGradients[weatherMain] || 'bg-gradient-to-br from-[#181818] via-blue-900/60 to-sky-900/70';
 }
 
 export function getTimeOfDay(): 'morning' | 'afternoon' | 'evening' | 'night' {

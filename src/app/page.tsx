@@ -23,7 +23,6 @@ export default function HomePage() {
   const [forecast, setForecast] = useState<ForecastData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [locationName, setLocationName] = useState<string>('');
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const timeOfDay = getTimeOfDay();
@@ -33,12 +32,12 @@ export default function HomePage() {
       return getWeatherGradient(weather.weather[0].main);
     }
     
-    // Default gradients based on time of day
+    // Default gradients based on time of day with #181818 base
     const timeGradients = {
-      morning: 'bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500',
-      afternoon: 'bg-gradient-to-br from-blue-500 via-cyan-500 to-blue-600',
-      evening: 'bg-gradient-to-br from-orange-400 via-pink-500 to-purple-600',
-      night: 'bg-gradient-to-br from-gray-900 via-purple-900 to-indigo-900',
+      morning: 'bg-gradient-to-br from-[#181818] via-blue-900/80 to-purple-900/60',
+      afternoon: 'bg-gradient-to-br from-[#181818] via-blue-800/70 to-cyan-900/60',
+      evening: 'bg-gradient-to-br from-[#181818] via-orange-900/70 to-pink-900/60',
+      night: 'bg-gradient-to-br from-[#181818] via-gray-900/80 to-indigo-900/70',
     };
     
     return timeGradients[timeOfDay];
@@ -57,14 +56,13 @@ export default function HomePage() {
           WeatherAPI.getCurrentWeather(lat, lon),
           WeatherAPI.getForecast(lat, lon)
         ]);
-        const name = await WeatherAPI.getLocationFromCoords(lat, lon);
-        setLocationName(name);
+
       } else if (cityName) {
         [weatherData, forecastData] = await Promise.all([
           WeatherAPI.getCurrentWeatherByCity(cityName),
           WeatherAPI.getForecastByCity(cityName)
         ]);
-        setLocationName(`${weatherData.name}, ${weatherData.sys.country}`);
+
       } else {
         throw new Error('No location provided');
       }
@@ -220,15 +218,15 @@ export default function HomePage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="grid grid-cols-1 lg:grid-cols-3 gap-8"
+                className="space-y-8"
               >
                 {/* Main Weather Card */}
-                <div className="lg:col-span-2">
+                <div>
                   <WeatherCard weather={weather} />
                 </div>
 
                 {/* Forecast Card */}
-                <div className="lg:col-span-1">
+                <div>
                   {forecast && <ForecastCard forecast={forecast} />}
                 </div>
               </motion.div>
@@ -249,10 +247,10 @@ export default function HomePage() {
             <div className="flex items-center justify-center space-x-2 text-white/60 text-sm">
               <span>Made with</span>
               <Heart className="w-4 h-4 text-red-400" />
-              <span>by StillSky Team</span>
+              <span>Amey Dabhade</span>
               <span>•</span>
               <a 
-                href="https://github.com" 
+                href="https://github.com/ameydabhade/stillsky" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="flex items-center space-x-1 hover:text-white transition-colors"
@@ -261,11 +259,7 @@ export default function HomePage() {
                 <span>GitHub</span>
               </a>
             </div>
-            {error && (
-              <p className="text-white/40 text-xs mt-2">
-                To use live data, please add your OpenWeatherMap API key to environment variables
-              </p>
-            )}
+
           </motion.div>
         </div>
       </footer>

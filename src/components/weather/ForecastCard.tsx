@@ -22,42 +22,42 @@ export function ForecastCard({ forecast, className }: ForecastCardProps) {
 
   return (
     <div className={className}>
-      {/* Hourly Forecast */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
-        className="mb-6"
-      >
-        <Card glass className="text-white">
-          <CardHeader>
-            <div className="flex items-center space-x-2">
-              <Clock className="w-5 h-5" />
-              <h3 className="text-lg font-semibold">24-Hour Forecast</h3>
-            </div>
-          </CardHeader>
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        {/* Hourly Forecast */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
+          <Card glass className="text-white h-full">
+            <CardHeader>
+              <div className="flex items-center space-x-2">
+                <Clock className="w-5 h-5" />
+                <h3 className="text-lg font-semibold">24-Hour Forecast</h3>
+              </div>
+            </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-4 md:grid-cols-8 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
               {hourlyForecast.map((item, index) => (
                 <motion.div
                   key={item.dt}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 * index }}
-                  className="text-center bg-white/5 rounded-lg p-3 backdrop-blur-sm hover:bg-white/10 transition-colors duration-300"
+                  className="text-center bg-white/5 rounded-lg p-3 backdrop-blur-sm hover:bg-white/10 transition-colors duration-300 min-h-[100px] flex flex-col justify-between"
                 >
-                  <div className="text-xs text-white/60 mb-1">
+                  <div className="text-xs text-white/70 font-medium mb-2">
                     {formatTime(item.dt)}
                   </div>
                   <img
                     src={WeatherAPI.getWeatherIconUrl(item.weather[0].icon)}
                     alt={item.weather[0].description}
-                    className="w-8 h-8 mx-auto mb-1"
+                    className="w-8 h-8 mx-auto mb-2"
                   />
-                  <div className="text-sm font-medium">
+                  <div className="text-sm font-semibold text-white mb-1">
                     {formatTemperature(item.main.temp)}
                   </div>
-                  <div className="text-xs text-white/60">
+                  <div className="text-xs text-blue-300 font-medium">
                     {Math.round(item.pop * 100)}%
                   </div>
                 </motion.div>
@@ -125,7 +125,8 @@ export function ForecastCard({ forecast, className }: ForecastCardProps) {
             </div>
           </CardContent>
         </Card>
-      </motion.div>
+        </motion.div>
+      </div>
     </div>
   );
 } 
