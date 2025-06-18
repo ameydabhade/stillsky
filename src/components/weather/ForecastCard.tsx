@@ -3,7 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Clock, Calendar } from 'lucide-react';
-import { ForecastData, ForecastItem } from '@/types/weather';
+import { ForecastData } from '@/types/weather';
 import { formatTemperature, formatTime, formatDate } from '@/lib/utils';
 import { Card, CardContent, CardHeader } from '@/components/ui/Card';
 import { WeatherAPI } from '@/lib/weather-api';

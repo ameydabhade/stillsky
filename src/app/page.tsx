@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Navigation, 
@@ -74,13 +74,13 @@ export default function HomePage() {
       setError('Unable to fetch weather data. Using demo data.');
       // Use demo data as fallback
       setWeather(DEMO_WEATHER_DATA);
-      setLocationName('Demo Location');
+
     } finally {
       setLoading(false);
     }
   };
 
-  const getCurrentLocation = () => {
+  const getCurrentLocation = useCallback(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -90,17 +90,15 @@ export default function HomePage() {
           console.error('Geolocation error:', error);
           setError('Location access denied. Using demo data.');
           setWeather(DEMO_WEATHER_DATA);
-          setLocationName('Demo Location');
           setLoading(false);
         }
       );
     } else {
       setError('Geolocation not supported. Using demo data.');
       setWeather(DEMO_WEATHER_DATA);
-      setLocationName('Demo Location');
       setLoading(false);
     }
-  };
+  }, []);
 
   const handleLocationSelect = (location: WeatherSearchResult) => {
     fetchWeatherData(location.lat, location.lon);
