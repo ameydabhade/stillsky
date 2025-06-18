@@ -68,7 +68,7 @@ export function SearchBox({
   };
 
   return (
-    <div ref={searchRef} className={cn('relative w-full max-w-md', className)}>
+    <div ref={searchRef} className={cn('relative w-full max-w-md z-[100]', className)}>
       <div className="relative">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60 w-5 h-5" />
         <input
@@ -90,7 +90,13 @@ export function SearchBox({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="absolute top-full left-0 right-0 mt-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl shadow-xl z-50 overflow-hidden"
+            className="absolute top-full left-0 right-0 mt-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl shadow-xl overflow-hidden"
+            style={{ 
+              position: 'absolute',
+              zIndex: 999999,
+              transform: 'translateZ(0)',
+              isolation: 'isolate'
+            }}
           >
             {results.map((location) => (
               <motion.button

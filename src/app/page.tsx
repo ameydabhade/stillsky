@@ -123,7 +123,7 @@ export default function HomePage() {
       <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
       
       {/* Header */}
-      <header className="relative z-10 p-6">
+      <header className="relative z-50 p-6">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
