@@ -1,7 +1,7 @@
 import { WeatherData, ForecastData, GeocodingData, WeatherSearchResult } from '@/types/weather';
 
-const API_KEY = process.env.NEXT_PUBLIC_WEATHER_API_KEY || 'demo_key';
-const BASE_URL = process.env.NEXT_PUBLIC_WEATHER_API_URL || 'https://api.openweathermap.org/data/2.5';
+const API_KEY = 'db15c096d0fb4b36a102fb484b94c8dd';
+const BASE_URL = 'https://api.openweathermap.org/data/2.5';
 const GEO_URL = 'https://api.openweathermap.org/geo/1.0';
 
 export class WeatherAPI {
