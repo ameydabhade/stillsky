@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Navigation, 
@@ -17,6 +17,17 @@ import { getWeatherGradient, getTimeOfDay } from '@/lib/utils';
 import { SearchBox } from '@/components/ui/SearchBox';
 import { WeatherCard } from '@/components/weather/WeatherCard';
 import { ForecastCard } from '@/components/weather/ForecastCard';
+import { 
+  pageLoadAnimation, 
+  createParticleSystem, 
+  refreshAnimation,
+  buttonPressAnimation,
+  weatherTransition,
+  initScrollAnimations,
+  magneticEffect,
+  textRevealAnimation,
+  parallaxScroll
+} from '@/lib/gsap-animations';
 
 export default function HomePage() {
   const [weather, setWeather] = useState<WeatherData | null>(null);
@@ -24,6 +35,11 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  
+  const backgroundRef = useRef<HTMLDivElement>(null);
+  const refreshButtonRef = useRef<HTMLButtonElement>(null);
+  const locationButtonRef = useRef<HTMLButtonElement>(null);
+  const hasAnimated = useRef(false);
 
   const timeOfDay = getTimeOfDay();
 
@@ -69,6 +85,17 @@ export default function HomePage() {
       
       setWeather(weatherData);
       setForecast(forecastData);
+      
+      // Create particle system based on weather
+      if (backgroundRef.current) {
+        // Clear existing particles
+        const existingParticles = backgroundRef.current.querySelectorAll('.floating-particle');
+        existingParticles.forEach(particle => particle.remove());
+        
+        // Create new particles
+        createParticleSystem(backgroundRef.current, weatherData.weather[0].main);
+      }
+      
     } catch (err) {
       console.error('Error fetching weather data:', err);
       setError('Unable to fetch weather data. Using demo data.');
@@ -101,74 +128,105 @@ export default function HomePage() {
   }, []);
 
   const handleLocationSelect = (location: WeatherSearchResult) => {
-    fetchWeatherData(location.lat, location.lon);
+    weatherTransition(location.name);
+    setTimeout(() => {
+      fetchWeatherData(location.lat, location.lon);
+    }, 400);
   };
 
   const handleRefresh = async () => {
-    if (weather) {
+    if (weather && refreshButtonRef.current) {
       setIsRefreshing(true);
+      refreshAnimation(refreshButtonRef.current);
       await fetchWeatherData(weather.coord.lat, weather.coord.lon);
       setIsRefreshing(false);
     }
   };
+
+  const handleLocationClick = () => {
+    if (locationButtonRef.current) {
+      buttonPressAnimation(locationButtonRef.current);
+    }
+    getCurrentLocation();
+  };
+
+  // Initialize GSAP animations
+  useEffect(() => {
+    if (!loading && !hasAnimated.current) {
+      setTimeout(() => {
+        pageLoadAnimation();
+        initScrollAnimations();
+        parallaxScroll();
+        
+        // Add magnetic effect to interactive buttons
+        const interactiveElements = document.querySelectorAll('.magnetic-element');
+        interactiveElements.forEach((element) => {
+          magneticEffect(element as HTMLElement);
+        });
+        
+        // Add text reveal to title
+        const titleElement = document.querySelector('.title-reveal');
+        if (titleElement) {
+          textRevealAnimation(titleElement as HTMLElement, 0.5);
+        }
+        
+        hasAnimated.current = true;
+      }, 100);
+    }
+  }, [loading]);
 
   useEffect(() => {
     getCurrentLocation();
   }, []);
 
   return (
-    <div className={`min-h-screen ${getBackgroundGradient()} transition-all duration-1000`}>
-      {/* Background Pattern */}
+    <div ref={backgroundRef} className={`min-h-screen ${getBackgroundGradient()} transition-all duration-1000 relative overflow-hidden`}>
+      {/* Enhanced Background Layers */}
       <div className="absolute inset-0 bg-black/20" />
       <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+      
+      {/* Animated background elements for parallax */}
+      <div className="parallax-element absolute top-20 left-10 w-32 h-32 bg-white/5 rounded-full blur-xl" />
+      <div className="parallax-element absolute top-60 right-20 w-24 h-24 bg-blue-400/10 rounded-full blur-lg" />
+      <div className="parallax-element absolute bottom-40 left-1/4 w-40 h-40 bg-purple-400/5 rounded-full blur-2xl" />
       
       {/* Header */}
       <header className="relative z-50 p-6">
         <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex items-center justify-between"
-          >
-            <div className="flex items-center space-x-3">
-              <motion.div
-                whileHover={{ rotate: 360 }}
-                transition={{ duration: 0.6 }}
-                className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm"
-              >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3 header-element">
+              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm hover:bg-white/30 transition-colors cursor-pointer">
                 <Navigation className="w-6 h-6 text-white" />
-              </motion.div>
+              </div>
               <div>
-                <h1 className="text-2xl font-bold text-white">StillSky</h1>
+                <h1 className="text-2xl font-bold text-white title-reveal">StillSky</h1>
                 <p className="text-white/60 text-sm">Beautiful Weather Experience</p>
               </div>
             </div>
 
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-4 header-element">
               <SearchBox onLocationSelect={handleLocationSelect} />
               
               {weather && (
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                <button
+                  ref={refreshButtonRef}
                   onClick={handleRefresh}
                   disabled={isRefreshing}
-                  className="p-3 bg-white/10 rounded-full text-white hover:bg-white/20 transition-colors backdrop-blur-sm disabled:opacity-50"
+                  className="magnetic-element p-3 bg-white/10 rounded-full text-white hover:bg-white/20 transition-colors backdrop-blur-sm disabled:opacity-50 hover:scale-105 transition-transform"
                 >
                   <RefreshCw className={`w-5 h-5 ${isRefreshing ? 'animate-spin' : ''}`} />
-                </motion.button>
+                </button>
               )}
               
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={getCurrentLocation}
-                className="p-3 bg-white/10 rounded-full text-white hover:bg-white/20 transition-colors backdrop-blur-sm"
+              <button
+                ref={locationButtonRef}
+                onClick={handleLocationClick}
+                className="magnetic-element p-3 bg-white/10 rounded-full text-white hover:bg-white/20 transition-colors backdrop-blur-sm hover:scale-105 transition-transform"
               >
                 <MapPin className="w-5 h-5" />
-              </motion.button>
+              </button>
             </div>
-          </motion.div>
+          </div>
         </div>
       </header>
 
@@ -185,7 +243,10 @@ export default function HomePage() {
                 className="flex items-center justify-center min-h-[60vh]"
               >
                 <div className="text-center">
-                  <Loader2 className="w-12 h-12 text-white animate-spin mx-auto mb-4" />
+                  <div className="relative">
+                    <Loader2 className="w-12 h-12 text-white mx-auto mb-4 loading-spinner" />
+                    <div className="absolute inset-0 w-12 h-12 border-2 border-white/20 border-t-white/60 rounded-full animate-spin mx-auto" />
+                  </div>
                   <p className="text-white/80 text-lg">Getting weather data...</p>
                 </div>
               </motion.div>
@@ -200,65 +261,52 @@ export default function HomePage() {
                 <div className="text-center bg-white/10 backdrop-blur-sm rounded-xl p-8 border border-white/20">
                   <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
                   <p className="text-white text-lg mb-4">{error}</p>
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                  <button
                     onClick={getCurrentLocation}
-                    className="px-6 py-3 bg-white/20 text-white rounded-lg hover:bg-white/30 transition-colors backdrop-blur-sm"
+                    className="px-6 py-3 bg-white/20 text-white rounded-lg hover:bg-white/30 transition-colors backdrop-blur-sm hover:scale-105 transition-transform"
                   >
                     Try Again
-                  </motion.button>
+                  </button>
                 </div>
               </motion.div>
             ) : weather ? (
-              <motion.div
-                key="weather"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="space-y-8"
-              >
+              <div className="space-y-8 weather-content">
                 {/* Main Weather Card */}
-                <div>
+                <div className="weather-card">
                   <WeatherCard weather={weather} />
                 </div>
 
                 {/* Forecast Card */}
-                <div>
+                <div className="forecast-card">
                   {forecast && <ForecastCard forecast={forecast} />}
                 </div>
-              </motion.div>
+              </div>
             ) : null}
           </AnimatePresence>
         </div>
       </main>
 
-      {/* Footer */}
+      {/* Enhanced Footer */}
       <footer className="relative z-10 p-6 mt-auto">
         <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1 }}
-            className="text-center"
-          >
+          <div className="text-center header-element">
             <div className="flex items-center justify-center space-x-2 text-white/60 text-sm">
               <span>Made with</span>
-              <Heart className="w-4 h-4 text-red-400" />
+              <Heart className="w-4 h-4 text-red-400 animate-pulse" />
               <span>Amey Dabhade</span>
               <span>•</span>
               <a 
                 href="https://github.com/ameydabhade/stillsky" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="flex items-center space-x-1 hover:text-white transition-colors"
+                className="flex items-center space-x-1 hover:text-white transition-colors hover:scale-105 transition-transform"
+                onClick={(e) => buttonPressAnimation(e.currentTarget as HTMLElement)}
               >
                 <Github className="w-4 h-4" />
                 <span>GitHub</span>
               </a>
             </div>
-
-          </motion.div>
+          </div>
         </div>
       </footer>
     </div>
